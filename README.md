@@ -14,7 +14,7 @@ This project is inspired by [chatpdf-rag-deepseek-r1](https://github.com/paquino
 
 ## User Interface
 
-<img src="image/ui.png" alt="User Interface" width="1560"/>
+<img src="image/ui.png" alt="User Interface" width="1920"/>
 ---
 
 ## Installation
