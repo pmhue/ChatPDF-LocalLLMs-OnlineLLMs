@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  chatpdf:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/chatpdf/src
+    container_name: chatpdf
+    image: username/chatpdf:v1
+    ports:
+      - "8501:8501"  # Streamlit
+      - "11434:11434"  # Ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]  # Enable GPU access if needed
