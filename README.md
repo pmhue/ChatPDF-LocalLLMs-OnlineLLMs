@@ -84,6 +84,7 @@ For GPT or Gemini models, you must specify their API key in the provided input f
 
 | Model Name | Identifier | Embedding Model | Dimensions |
 |------------|------------|----------------|------------|
+| GPT-4o  | `chatgpt-4o-latest` | `text-embedding-3-large` | 3072 |
 | GPT-4o Mini | `gpt-4o-mini` | `text-embedding-3-large` | 3072 |
 | Gemini 2.0 Flash | `gemini-2.0-flash-exp` | `text-embedding-004` | 768 |
 | Gemini 1.5 Pro | `gemini-1.5-pro` | `text-embedding-004` | 768 |
