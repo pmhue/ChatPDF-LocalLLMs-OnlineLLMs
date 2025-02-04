@@ -13,31 +13,44 @@ from langchain_chroma import Chroma
 import logging
 import os
 import shutil
+import streamlit as st
+import requests
+import subprocess
+import re
 
 set_debug(True)
 set_verbose(True)
 
-ollama_endpoint = os.getenv('OLLAMA_ENDPOINT') or "http://localhost:11434"
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+ollama_endpoint = "http://localhost:11434"
 
 
 class ChatPDF:
     """A class for handling PDF ingestion and question answering using RAG."""
 
-    def __init__(self, is_local: bool = True, openai_api_key: str = "", llm_model: str = "", embedding_model: str = ""):
+    def __init__(self, is_local: bool = True, api_key: str = "", llm_model: str = "", embedding_model: str = "", dimensions: int = 1024):
         """
         Initialize the ChatPDF instance with an LLM and embedding model.
         """
-        self.model_name = llm_model.split("-")[0]
-        # self.model = ChatOllama(model=llm_model) if is_local else ChatOpenAI(api_key=openai_api_key, model="gpt-4o-mini")
-        # self.embeddings = OllamaEmbeddings(model=embedding_model) if is_local else OpenAIEmbeddings(api_key=openai_api_key, model="text-embedding-3-large")
+        self.llm_model = llm_model
+        self.embedding_model = embedding_model
+        self.is_local = is_local
 
+        if self.is_local:
+            self.pull_model()
+            self.model = ChatOllama(model=llm_model)
+            self.embeddings = OllamaEmbeddings(model=embedding_model) 
+        else:
+            if "gpt" in llm_model:
+                self.model = ChatOpenAI(model=llm_model)
+                self.embeddings = OpenAIEmbeddings(model=embedding_model)
+            else:
+                self.model = ChatGoogleGenerativeAI(model=llm_model)
+                self.embeddings = GoogleGenerativeAIEmbeddings(model="models/"+embedding_model)
 
-
-        self.chunk_size = 1024 if is_local else 3072
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=100)# if is_local else None
+        self.chunk_size = dimensions
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=100)
 
         self.prompt = ChatPromptTemplate.from_template(
             """
@@ -67,10 +80,10 @@ class ChatPDF:
         chunks = filter_complex_metadata(chunks)
 
         self.vector_store = Chroma.from_documents(
-            collection_name=f"pdf_collection_{self.model_name}",
+            collection_name = f"pdf_collection_{re.sub(r'[^a-zA-Z0-9._-]', '', self.llm_model)}",
             documents=chunks,
             embedding=self.embeddings,
-            persist_directory = f"chroma_db_{self.model_name}",
+            persist_directory = f"chroma_db_{self.llm_model}",
             collection_metadata={"hnsw:space": "cosine"}
         )
         
@@ -119,3 +132,34 @@ class ChatPDF:
         logger.info("Clearing vector store and retriever.")
         self.vector_store = None
         self.retriever = None
+
+    def pull_model(self):
+        """Pull the specified model from the Ollama server."""
+
+        with st.spinner(f"Pulling model {self.llm_model}..."):
+            response_llm = requests.post(
+                f"{ollama_endpoint}/api/pull",
+                json={"model": self.llm_model}
+            )
+        
+        if response_llm.status_code != 200:
+            st.error(f"Failed to pull model {self.llm_model}: {response_llm.text}")
+            raise Exception(f"Model pull failed: {response_llm.text}")
+        else:
+            st.sidebar.success(f"Model {self.llm_model} pulled successfully.")
+
+        with st.spinner(f"Pulling embedding model {self.embedding_model}..."):
+            os.system(f"ollama pull {self.embedding_model}")
+
+            result = subprocess.run(
+                ["ollama", "pull", self.embedding_model],
+                capture_output=True,
+                text=True
+            )
+
+        if result.returncode == 0:
+            st.sidebar.success(f"Embedding model {self.embedding_model} pulled successfully.")
+        else:
+            st.error(f"Failed to pull embedding model {self.embedding_model}: {result.stderr}")
+            raise Exception(f"Embedding model pull failed: {result.stderr}")
+        

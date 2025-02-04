@@ -1,4 +1,4 @@
-# Local ChatPDF with DeepSeek R1 / OpenAI API
+# Local ChatPDF with Local Ollama Models / Online LLM APIs
 
 **ChatPDF** is a Retrieval-Augmented Generation (RAG) application that allows users to upload PDF documents and interact with them through a chatbot interface. The system uses advanced embedding models and a local vector store for efficient and accurate question-answering.
 
@@ -24,13 +24,13 @@ Follow the steps below to set up and run the application:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/DucTriCE/ChatPDF-Deepseek-OpenAI.git
-cd ChatPDF-Deepseek-OpenAI
+git clone https://github.com/DucTriCE/ChatPDF-LocalLLMs-OnlineAPIs.git
+cd ChatPDF-LocalLLMs-OnlineAPIs
 ```
 
 ### 2. Install Docker
 
-Make sure Docker and Docker Compose is installed on your system. You can follow the instructions [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04) (For Ubuntu 20.04, you can find different tutorial based on your system).
+Make sure Docker and Docker Compose is installed on your system. You can follow the instructions [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04) (This tutorial is for Ubuntu 20.04, you can find different tutorial based on your system).
 
 ### 3. Build and Run the Docker Container
 
@@ -52,7 +52,42 @@ docker-compose up
 The application will be available at `http://localhost:8501`.
 
 ### 2. Choosing Models
-You can choose between two models: `deepseek-r1:latest` and `gpt-4o-mini`. If you select the OpenAI model (`gpt-4o-mini`), you will need to specify your OpenAI API key in the provided input field.
+#### Local Ollama Models
+
+Ollama provides a variety of models, with additional options available at [Ollama](https://ollama.com/search). You can add more models by adjusting config.py as you wish. The Deepseek R1 model is included by default when building the project, while other models may require additional time for downloading.
+
+| Model Name | Parameters | Size | Identifier | Embedding Model | Dimensions |
+|------------|------------|------|------------|----------------|------------|
+| Deepseek R1 (*available) | 1.3B | 1.3GB | `deepseek-r1:latest` | `mxbai-embed-large` | 1024 |
+| Llama 3.2 | 3B | 2.0GB | `llama3.2` | `all-minilm` | 1024 |
+| Llama 3.2 | 1B | 1.3GB | `llama3.2:1b` | `all-minilm` | 1024 |
+| Llama 3.1 | 8B | 4.7GB | `llama3.1` | `all-minilm` | 1024 |
+| Llama 3.1 | 70B | 40GB | `llama3.1:70b` | `all-minilm` | 1024 |
+| Llama 3.1 | 405B | 231GB | `llama3.1:405b` | `all-minilm` | 1024 |
+| Phi 3 Mini | 3.8B | 2.3GB | `phi3` | `all-minilm` | 1024 |
+| Phi 3 Medium | 14B | 7.9GB | `phi3:medium` | `all-minilm` | 1024 |
+| Gemma 2 | 2B | 1.6GB | `gemma2:2b` | `all-minilm` | 1024 |
+| Gemma 2 | 9B | 5.5GB | `gemma2` | `all-minilm` | 1024 |
+| Gemma 2 | 27B | 16GB | `gemma2:27b` | `all-minilm` | 1024 |
+| Mistral | 7B | 4.1GB | `mistral` | `all-minilm` | 1024 |
+| Moondream 2 | 1.4B | 829MB | `moondream` | `all-minilm` | 1024 |
+| Neural Chat | 7B | 4.1GB | `neural-chat` | `all-minilm` | 1024 |
+| Starling | 7B | 4.1GB | `starling-lm` | `all-minilm` | 1024 |
+| Code Llama | 7B | 3.8GB | `codellama` | `all-minilm` | 1024 |
+| Llama 2 Uncensored | 7B | 3.8GB | `llama2-uncensored` | `all-minilm` | 1024 |
+| LLaVA | 7B | 4.5GB | `llava` | `all-minilm` | 1024 |
+| Solar | 10.7B | 6.1GB | `solar` | `all-minilm` | 1024 |
+
+#### Online Model APIs
+
+For GPT or Gemini models, you must specify their API key in the provided input field.
+
+| Model Name | Identifier | Embedding Model | Dimensions |
+|------------|------------|----------------|------------|
+| GPT-4o Mini | `gpt-4o-mini` | `text-embedding-3-large` | 3072 |
+| Gemini 2.0 Flash | `gemini-2.0-flash-exp` | `text-embedding-004` | 768 |
+| Gemini 1.5 Pro | `gemini-1.5-pro` | `text-embedding-004` | 768 |
+| Gemini 1.5 Flash | `gemini-1.5-flash` | `text-embedding-004` | 768 |
 
 ### 3. Upload Documents
 
@@ -69,9 +104,11 @@ You can choose between two models: `deepseek-r1:latest` and `gpt-4o-mini`. If yo
 ## Project Structure
 
 ```
-.
+├── image                   # Directory containing images used in the project
 ├── app.py                  # Streamlit app for the user interface
-├── rag.py                  # Core RAG logic for PDF ingestion and question-answering
+├── rag.py                  # Core RAG logic for LLMs/Embeddings loading, PDF ingestion and question-answering
+├── utils.py                # Utility functions for the application
+├── config.py               # Configuration file for model settings
 ├── requirements.txt        # List of required Python dependencies
 ├── chroma_db_*/            # Local persistent vector store (auto-generated)
 ├── Dockerfile              # Dockerfile for building the image
@@ -82,15 +119,8 @@ You can choose between two models: `deepseek-r1:latest` and `gpt-4o-mini`. If yo
 
 ## Configuration
 
-You can modify the following parameters in `rag.py` to suit your needs:
+You can modify the following parameters in `config.py` to suit your needs:
 
-**Models**:
-   - Default Deepseek LLM: `deepseek-r1:latest` (7B parameters)
-   - Default Embedding: `mxbai-embed-large` (1024 dimensions)
-   - Default OpenAI LLM: `gpt-4o-mini` (8B parameters)
-   - Default OpenAI Embedding: `text-embedding-3-large` (3072 dimensions)
-   - Any Ollama-compatible model can be used by updating the `llm_model` parameter
----
 
 ## Requirements
 
