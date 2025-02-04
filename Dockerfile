@@ -30,6 +30,6 @@ EXPOSE 11434 8501
 # Start Ollama in the background and run Streamlit
 CMD ollama serve & \
     while ! curl -s http://localhost:11434/api/info > /dev/null; do sleep 1; done && \
-    ollama pull mxbai-embed-large && \
-    ollama pull deepseek-r1:latest && \
+    # ollama pull mxbai-embed-large && \
+    # ollama pull deepseek-r1:latest && \
     streamlit run app.py

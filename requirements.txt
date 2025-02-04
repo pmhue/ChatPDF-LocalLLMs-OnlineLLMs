@@ -3,6 +3,7 @@ langchain
 langchain_ollama
 langchain_community
 langchain-openai
+langchain-google-genai
 langchain-chroma>=0.1.2
 streamlit-chat
 pypdf

@@ -4,6 +4,7 @@ import tempfile
 import time
 import streamlit as st
 from rag import ChatPDF
+from config import OLLAMA_MODELS, ONLINE_MODELS
 
 st.set_page_config(page_title="RAG with Local DeepSeek R1")
 
@@ -34,7 +35,9 @@ def chat():
 
     if prompt := st.chat_input(key="chat", placeholder="What is up?"):
         st.session_state.chat_history.append({"role": "user", "content": prompt})
-
+        if st.session_state.assistant is None:
+            st.write("Please select a model.")
+            return
         with st.chat_message("user"):
             st.markdown(prompt)
 
@@ -97,25 +100,40 @@ def page():
     with st.sidebar:
 
         option = st.selectbox(
-            "Model",
-            ("deepseek-r1:latest", "gpt-4o-mini"),
+            "Choosing host type",
+            ("Local", "Online"),
             index=None,
             label_visibility=st.session_state.visibility,
             disabled=st.session_state.disabled,
         )
 
+
         if "selected_model" not in st.session_state or st.session_state.selected_model != option:
             st.session_state.selected_model = option  # Store the new selection
             st.session_state.assistant = None  # Reset assistant to force reloading
 
-        if option == "deepseek-r1:latest":
-            st.write(f"model: {option}")
-            st.write("embeddings: mxbai-embed-large")
-            st.session_state.deepseek = True
-            st.session_state.model = option
-            st.session_state.embeddings = "mxbai-embed-large"
+        if option == "Local":
+
+            llm_option = st.selectbox(
+                "Choosing model",
+                (tuple(OLLAMA_MODELS.keys())),
+                index=None,
+                label_visibility=st.session_state.visibility,
+                disabled=st.session_state.disabled,
+            )
+
+            if not llm_option:
+                st.warning("Please select a model.")
+                return
+            
+            st.write(f"LLM: '{OLLAMA_MODELS[llm_option]['llm_model']}'")
+            st.write("Embeddings: 'all-minilm'")
+
+            st.session_state.model = OLLAMA_MODELS[llm_option]["llm_model"]
+            st.session_state.embeddings = "all-minilm"
 
         elif option == "gpt-4o-mini":
+            
             st.write(f"models: {option}")
             st.write("embedding: text-embedding-3-large")
             st.session_state.model = option
@@ -134,7 +152,7 @@ def page():
                 if st.button("Show API Key"):
                     st.write(f'"{st.session_state.openai_api_key}"')
         else:
-            st.warning("Please select a model.")
+            st.warning("Please select LLM's type options.")
             return
         
         if st.session_state.assistant is None:

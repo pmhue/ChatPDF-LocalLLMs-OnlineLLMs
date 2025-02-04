@@ -2,8 +2,8 @@
 from langchain_core.globals import set_verbose, set_debug
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.schema.output_parser import StrOutputParser
-# from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.runnable import RunnablePassthrough
@@ -17,6 +17,8 @@ import shutil
 set_debug(True)
 set_verbose(True)
 
+ollama_endpoint = os.getenv('OLLAMA_ENDPOINT') or "http://localhost:11434"
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -29,8 +31,11 @@ class ChatPDF:
         Initialize the ChatPDF instance with an LLM and embedding model.
         """
         self.model_name = llm_model.split("-")[0]
-        self.model = ChatOllama(model=llm_model) if is_local else ChatOpenAI(api_key=openai_api_key, model="gpt-4o-mini")
-        self.embeddings = OllamaEmbeddings(model=embedding_model) if is_local else OpenAIEmbeddings(api_key=openai_api_key, model="text-embedding-3-large")
+        # self.model = ChatOllama(model=llm_model) if is_local else ChatOpenAI(api_key=openai_api_key, model="gpt-4o-mini")
+        # self.embeddings = OllamaEmbeddings(model=embedding_model) if is_local else OpenAIEmbeddings(api_key=openai_api_key, model="text-embedding-3-large")
+
+
+
         self.chunk_size = 1024 if is_local else 3072
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=100)# if is_local else None
 
@@ -57,6 +62,7 @@ class ChatPDF:
         logger.info(f"Starting ingestion for file: {pdf_file_path}")
         docs = PyPDFLoader(file_path=pdf_file_path).load()
         chunks = self.text_splitter.split_documents(docs)
+        
 
         chunks = filter_complex_metadata(chunks)
 
