@@ -1,4 +1,5 @@
 OLLAMA_MODELS = {
+    "Deepseek R1 (1.3B - 1.3GB)": {"llm_model": "deepseek-r1:latest"},
     "Llama 3.2 (3B - 2.0GB)": {"llm_model": "llama3.2"},
     "Llama 3.2 (1B - 1.3GB)": {"llm_model": "llama3.2:1b"},
     "Llama 3.1 (8B - 4.7GB)": {"llm_model": "llama3.1"},
@@ -22,14 +23,22 @@ OLLAMA_MODELS = {
 ONLINE_MODELS = {
     "GPT-4o Mini": {
         "llm_model": "gpt-4o-mini",
-        "embedding_model": "text-embedding-3-large"
+        "embedding_model": "text-embedding-3-large",
+        "dimensions": 3072
     },
     "Gemini 2.0 Flash": {
         "llm_model": "gemini-2.0-flash-exp",
-        "embedding_model": "text-embedding-004"
+        "embedding_model": "text-embedding-004",
+        "dimensions": 768
+    },
+    "Gemini 1.5 Pro": {
+        "llm_model": "gemini-1.5-pro",
+        "embedding_model": "text-embedding-004",
+        "dimensions": 768
     },
     "Gemini 1.5 Flash": {
         "llm_model": "gemini-1.5-flash",
-        "embedding_model": "text-embedding-004"
+        "embedding_model": "text-embedding-004",
+        "dimensions": 768
     },
 }
