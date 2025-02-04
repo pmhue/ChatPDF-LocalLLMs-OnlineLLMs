@@ -30,7 +30,7 @@ cd ChatPDF-LocalLLMs-OnlineAPIs
 
 ### 2. Install Docker
 
-Make sure Docker and Docker Compose is installed on your system. You can follow the instructions [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04) (For Ubuntu 20.04, you can find different tutorial based on your system).
+Make sure Docker and Docker Compose is installed on your system. You can follow the instructions [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04) (This tutorial is for Ubuntu 20.04, you can find different tutorial based on your system).
 
 ### 3. Build and Run the Docker Container
 
