@@ -49,7 +49,7 @@ def page():
         st.session_state.llm_option = ""
 
     st.header("RAG with Local Ollama Models / Online LLMs API")
-    
+
     chat()
 
     with st.sidebar:
@@ -82,7 +82,7 @@ def page():
             st.session_state.embedding_model = "all-minilm" if "Deepseek" not in llm_option else "mxbai-embed-large"
             st.session_state.dimensions = 1024
             st.write(f"LLM: '{st.session_state.llm_model}'")
-            st.write(f"Embeddings: '{st.session_state.embedding_model}'")
+            st.write(f"Embedding: '{st.session_state.embedding_model}'")
             st.write(f"Dimensions: {st.session_state.dimensions}")
 
             st.session_state.llm_model = OLLAMA_MODELS[llm_option]["llm_model"]
@@ -107,7 +107,7 @@ def page():
             st.session_state.embedding_model = ONLINE_MODELS[llm_option]["embedding_model"]  
             st.session_state.dimensions = ONLINE_MODELS[llm_option]["dimensions"]     
             st.write(f"LLM: '{st.session_state.llm_model}'")
-            st.write(f"Embeddings: '{st.session_state.embedding_model}'")
+            st.write(f"Embedding: '{st.session_state.embedding_model}'")
             st.write(f"Dimensions: {st.session_state.dimensions}")
 
             if "GPT" in llm_option:
