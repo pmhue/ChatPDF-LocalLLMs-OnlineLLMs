@@ -1,4 +1,4 @@
-# Local ChatPDF with Local Ollama Models / Online LLM APIs
+# Local RAG-based ChatPDF with Ollama Models / Online LLM APIs
 
 **ChatPDF** is a Retrieval-Augmented Generation (RAG) application that allows users to upload PDF documents and interact with them through a chatbot interface. The system uses advanced embedding models and a local vector store for efficient and accurate question-answering.
 
